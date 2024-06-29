@@ -37,6 +37,7 @@ const formData = {
   otherServices: "0",
   cgst: "0",
   sgst: "0",
+  packageRate: "0",
 };
 
 const App = () => {
@@ -205,6 +206,14 @@ const App = () => {
                 </td>
                 <td className="border  border-[#214132] px-4   pb-2">
                   {form.numberOfNights}
+                </td>
+              </tr>
+              <tr>
+                <td className="border  border-[#214132] px-10   pb-2">
+                  Package Rate:{" "}
+                </td>
+                <td className="border  border-[#214132] px-4   pb-2">
+                  {form.packageRate}
                 </td>
               </tr>
             </tbody>
@@ -467,7 +476,19 @@ const App = () => {
                 />
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-x-2">
+              <div>
+                <Label>Package Rate</Label>
+
+                <Input
+                  value={form.packageRate}
+                  onChange={(e) =>
+                    setForm({ ...form, packageRate: e.target.value })
+                  }
+                  placeholder={`Enter package rate`}
+                />
+              </div>
               <div>
                 <Label>Acommodation</Label>
 
@@ -479,6 +500,8 @@ const App = () => {
                   placeholder={`Enter accommodation`}
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-x-2">
               <div>
                 <Label>Meals</Label>
 
@@ -488,8 +511,6 @@ const App = () => {
                   placeholder={`Enter meals`}
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
               <div>
                 <Label>Spa Services</Label>
 
@@ -501,6 +522,8 @@ const App = () => {
                   placeholder={`Enter spa Services`}
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-x-2">
               <div>
                 <Label>Activities</Label>
 
@@ -512,8 +535,6 @@ const App = () => {
                   placeholder={`Enter activities`}
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
               <div>
                 <Label>Games</Label>
 
@@ -523,6 +544,8 @@ const App = () => {
                   placeholder={`Enter games`}
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-x-2">
               <div>
                 <Label>Transportation</Label>
 
@@ -534,17 +557,17 @@ const App = () => {
                   placeholder={`Enter transportation`}
                 />
               </div>
-            </div>
-            <div>
-              <Label>Other Services</Label>
+              <div>
+                <Label>Other Services</Label>
 
-              <Input
-                value={form.otherServices}
-                onChange={(e) =>
-                  setForm({ ...form, otherServices: e.target.value })
-                }
-                placeholder={`Enter otherServices`}
-              />
+                <Input
+                  value={form.otherServices}
+                  onChange={(e) =>
+                    setForm({ ...form, otherServices: e.target.value })
+                  }
+                  placeholder={`Enter otherServices`}
+                />
+              </div>
             </div>
             <Button
               disabled={isLoading}
