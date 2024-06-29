@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+/* .maindiv {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #c6b16e;
+}
+
+.invoice-title {
+  font-size: 100px;
+  text-transform: uppercase;
+  font-weight: 700;
+  background-color: #934119;
+  padding: 0 0 20px 0;
+} */
+@layer base {
+  img {
+    @apply inline-block;
+  }
+}
+
+td {
+  font-weight: 600;
+  color: #214132;
+}
+
+/* #main {
+  position: relative;
+  width: 100%;
+}
+
+#main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("public/PEP VILLAGE LOGO 2.png");
+  background-size: contain;
+  background-position: center;
+  opacity: 0.5;
+  z-index: 1;
+  width: 100px;
+  background-repeat: no-repeat;
+}
+
+.background-image-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+} */
