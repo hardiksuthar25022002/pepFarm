@@ -343,8 +343,8 @@ const App = () => {
           </table>
         </div>
         <div className="mt-2 flex justify-between items-center bg-[#214132] p-2 text-[#c6b16e]">
-          <p className="uppercase font-bold px-8 text-3xl">Total</p>
-          <div className="pr-56 text-lg">
+          <p className="uppercase w-full font-bold px-8 text-3xl">Total</p>
+          <div className="pl-[240px] w-full text-lg">
             <div>
               Advance Paid:{" "}
               <span className="font-bold">Rs. {form?.advance}</span>
