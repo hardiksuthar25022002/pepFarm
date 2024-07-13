@@ -28,8 +28,8 @@ const formData = {
   roomtype: "",
   roomRatePerNight: "0",
   numberOfNights: "0",
-  accommodation: "6000",
-  meals: "10000",
+  accommodation: "0",
+  meals: "0",
   spaServices: "0",
   activities: "0",
   games: "0",
@@ -38,6 +38,8 @@ const formData = {
   cgst: "0",
   sgst: "0",
   packageRate: "0",
+  advance: "0",
+  due: "0",
 };
 
 const App = () => {
@@ -76,7 +78,7 @@ const App = () => {
         imgHeight * ratio
       );
 
-      pdf.save("invoice.pdf");
+      pdf.save(form?.name);
     }
     setIsLoading(false);
   };
@@ -317,19 +319,25 @@ const App = () => {
                 <td className="border border-[#214132] px-10   pb-2">
                   GST @ 9%(CGST)
                 </td>
-                <td className="border border-[#214132] px-4  pb-2">7,380</td>
+                <td className="border border-[#214132] px-4  pb-2">
+                  {form?.cgst}
+                </td>
               </tr>
               <tr>
                 <td className="border border-[#214132]  px-10  pb-2">
                   GST @ 9%(SGST/UTGST){" "}
                 </td>
-                <td className="border border-[#214132] px-4  pb-2">7,380</td>
+                <td className="border border-[#214132] px-4  pb-2">
+                  {form?.sgst}
+                </td>
               </tr>
               <tr>
                 <td className="border border-[#214132]  px-10  pb-2">
                   Total Tax{" "}
                 </td>
-                <td className="border border-[#214132] px-4  pb-2">14,760</td>
+                <td className="border border-[#214132] px-4  pb-2">
+                  {parseInt(form?.cgst) + parseInt(form?.sgst)}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -338,18 +346,19 @@ const App = () => {
           <p className="uppercase font-bold px-8 text-3xl">Total</p>
           <div className="pr-20">
             <div>
-              Advance Paid: <span className="font-bold">Rs. 5,760</span>
+              Advance Paid:{" "}
+              <span className="font-bold">Rs. {form?.advance}</span>
             </div>
             <div>
-              Advance Due:<span className="font-bold"> Rs. 10,000</span>
+              Advance Due:<span className="font-bold"> Rs. {form?.due}</span>
             </div>
           </div>
         </div>
         <div className="flex justify-between items-center pb-20 mt-2">
           <div className="flex flex-col mt-6 text-xs px-4 gap-y-2">
             <p>
-              Please make payment by 30th April 2024. <br /> Accepted Payment
-              Methods: Cash, Credit/Debit Card, Online Transfer, etc.
+              Payments : Advance 25% of package and rest before Checkout <br />
+              Accepted Payments : Cash, UPI Payments, Online Transfer, etc.
             </p>
             <div>
               <div className="font-bold bg-[#8f3b1f] text-[#c6b16e] inline-block px-2 py-1 rounded-md">
@@ -376,7 +385,7 @@ const App = () => {
           </div>
 
           <div className="">
-            <div className="w-40 mr-36 mt-14">
+            <div className="w-40 mr-24 mt-14">
               <img src={SmallLogo} alt="" />
             </div>
           </div>
@@ -384,7 +393,7 @@ const App = () => {
       </div>
 
       <div className="flex justify-center pr-10 pt-10">
-        <Button onClick={() => setOpen(true)} className="w-full">
+        <Button onClick={() => setOpen(true)} className="fixed top-10 right-10">
           Open Form
         </Button>
       </div>
@@ -569,6 +578,47 @@ const App = () => {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-4 gap-x-2 col-span-2">
+              <div>
+                <Label>CGST</Label>
+
+                <Input
+                  value={form.cgst}
+                  onChange={(e) => setForm({ ...form, cgst: e.target.value })}
+                  placeholder={`Enter CGST`}
+                />
+              </div>
+              <div>
+                <Label>SGST</Label>
+
+                <Input
+                  value={form.sgst}
+                  onChange={(e) => setForm({ ...form, sgst: e.target.value })}
+                  placeholder={`Enter SGST`}
+                />
+              </div>
+              <div>
+                <Label>Advance</Label>
+
+                <Input
+                  value={form.advance}
+                  onChange={(e) =>
+                    setForm({ ...form, advance: e.target.value })
+                  }
+                  placeholder={`Enter Advance`}
+                />
+              </div>
+              <div>
+                <Label>Due</Label>
+
+                <Input
+                  value={form.due}
+                  onChange={(e) => setForm({ ...form, due: e.target.value })}
+                  placeholder={`Enter Due Amount`}
+                />
+              </div>
+            </div>
+
             <Button
               disabled={isLoading}
               onClick={saveDivAsPDF}
