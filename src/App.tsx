@@ -175,7 +175,7 @@ const App = () => {
                   Check-in Date:{" "}
                 </td>
                 <td className="border  border-[#214132]  px-4  pb-2">
-                  {form.checkindate}
+                  {moment(form.checkindate).format("DD-MM-YYYY")}
                 </td>
               </tr>
               <tr>
@@ -183,7 +183,7 @@ const App = () => {
                   Check-out Date:{" "}
                 </td>
                 <td className="border  border-[#214132]  px-4  pb-2">
-                  {form.checkoutdate}
+                  {moment(form.checkoutdate).format("DD-MM-YYYY")}
                 </td>
               </tr>
               <tr>
@@ -344,7 +344,7 @@ const App = () => {
         </div>
         <div className="mt-2 flex justify-between items-center bg-[#214132] p-2 text-[#c6b16e]">
           <p className="uppercase font-bold px-8 text-3xl">Total</p>
-          <div className="pr-20">
+          <div className="pr-56 text-lg">
             <div>
               Advance Paid:{" "}
               <span className="font-bold">Rs. {form?.advance}</span>
@@ -428,29 +428,31 @@ const App = () => {
                 placeholder={`Enter Contact`}
               />
             </div>
-            <div>
-              <Label>Check In Date</Label>
+            <div className="grid grid-cols-2 gap-x-2">
+              <div>
+                <Label>Check In Date</Label>
 
-              <Input
-                type="date"
-                value={form.checkindate}
-                onChange={(e) =>
-                  setForm({ ...form, checkindate: e.target.value })
-                }
-                placeholder={`Enter Check in Date`}
-              />
-            </div>
-            <div>
-              <Label>Check Out Date</Label>
+                <Input
+                  type="date"
+                  value={form.checkindate}
+                  onChange={(e) =>
+                    setForm({ ...form, checkindate: e.target.value })
+                  }
+                  placeholder={`Enter Check in Date`}
+                />
+              </div>
+              <div>
+                <Label>Check Out Date</Label>
 
-              <Input
-                type="date"
-                value={form.checkoutdate}
-                onChange={(e) =>
-                  setForm({ ...form, checkoutdate: e.target.value })
-                }
-                placeholder={`Enter Check Out Date`}
-              />
+                <Input
+                  type="date"
+                  value={form.checkoutdate}
+                  onChange={(e) =>
+                    setForm({ ...form, checkoutdate: e.target.value })
+                  }
+                  placeholder={`Enter Check Out Date`}
+                />
+              </div>
             </div>
             <div>
               <Label>Room Type</Label>
