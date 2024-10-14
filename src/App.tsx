@@ -95,9 +95,9 @@ const App = () => {
               Hotel Name:{" "}
               <span className="font-normal">Palm Edge Paradise</span>
             </p>
-            {/* <p className="font-bold">
-              GSTIN: <span className="font-normal">---------</span>
-            </p> */}
+            <p className="font-bold">
+              GSTIN: <span className="font-normal">27ABCFB7144F1ZM</span>
+            </p>
             <p className="font-bold">
               Address:{" "}
               <span className="font-normal">
