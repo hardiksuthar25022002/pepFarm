@@ -317,7 +317,7 @@ const App = () => {
             <tbody>
               <tr>
                 <td className="border border-[#214132] px-10   pb-2">
-                  GST @ 9%(CGST)
+                  GST @ 6%(CGST)
                 </td>
                 <td className="border border-[#214132] px-4  pb-2">
                   {form?.cgst}
@@ -325,7 +325,7 @@ const App = () => {
               </tr>
               <tr>
                 <td className="border border-[#214132]  px-10  pb-2">
-                  GST @ 9%(SGST/UTGST){" "}
+                  GST @ 6%(SGST/UTGST){" "}
                 </td>
                 <td className="border border-[#214132] px-4  pb-2">
                   {form?.sgst}
@@ -390,6 +390,9 @@ const App = () => {
             </div>
           </div>
         </div>
+        <p className="px-4 text-xs mb-10">
+          *property managed and controlled by BADLAPUR PEP VILLAGE LLP
+        </p>
       </div>
 
       <div className="flex justify-center pr-10 pt-10">
