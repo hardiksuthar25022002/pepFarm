@@ -248,7 +248,7 @@ const App = () => {
               </tr>
               <tr>
                 <td className="border  border-[#214132]  px-10  pb-2">
-                  Meals{" "}
+                  Food & Beverage{" "}
                 </td>
                 <td className="border  border-[#214132]  px-4  pb-2">
                   {form.meals}
@@ -317,7 +317,7 @@ const App = () => {
             <tbody>
               <tr>
                 <td className="border border-[#214132] px-10   pb-2">
-                  GST @ 6%(CGST)
+                  CGST + SGST @ 12% on Accomodation
                 </td>
                 <td className="border border-[#214132] px-4  pb-2">
                   {form?.cgst}
@@ -325,7 +325,7 @@ const App = () => {
               </tr>
               <tr>
                 <td className="border border-[#214132]  px-10  pb-2">
-                  GST @ 6%(SGST/UTGST){" "}
+                  CGST + SGST @ 5% on Food & Beverage
                 </td>
                 <td className="border border-[#214132] px-4  pb-2">
                   {form?.sgst}
