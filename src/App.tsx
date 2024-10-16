@@ -390,7 +390,7 @@ const App = () => {
             </div>
           </div>
         </div>
-        <p className="px-4 text-xs mb-10">
+        <p className="px-4 text-xs mb-10 text-center">
           *property managed and controlled by BADLAPUR PEP VILLAGE LLP
         </p>
       </div>
