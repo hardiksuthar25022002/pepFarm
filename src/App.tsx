@@ -286,16 +286,33 @@ const App = () => {
                 ))}
               </tr>
               <tr>
-                <td className="border text-left  border-[#214132]  px-10  pb-2">
+                <td
+                  rowSpan={2}
+                  className="border text-left  border-[#214132]  px-10  pb-2"
+                >
                   Package Rate / Person / Night:{" "}
                 </td>
                 {roomTypes?.map((room) =>
                   room?.food?.map((food) => (
                     <td
+                      rowSpan={1}
                       colSpan={2 / roomTypes?.[0]?.food?.length}
                       className="border text-center text-[14px]  border-[#214132] px-4   pb-2"
                     >
                       {food?.type}
+                    </td>
+                  ))
+                )}
+              </tr>
+              <tr>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      rowSpan={1}
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center text-[14px]  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.roomRatePerNight}
                     </td>
                   ))
                 )}
