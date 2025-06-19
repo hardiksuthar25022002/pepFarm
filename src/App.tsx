@@ -60,13 +60,21 @@ const formData = {
 const ROOMLIMIT = 3;
 const FOODLIMIT = 2;
 
-const accGstDict = {
+interface GstDict {
+  Villa: number;
+  Cottage: number;
+  Dormitory: number;
+
+  [key: string]: number;
+}
+
+const accGstDict: GstDict = {
   Villa: (41 / 100) * (12 / 100),
   Cottage: (45 / 100) * (12 / 100),
   Dormitory: (33 / 100) * (12 / 100),
 };
 
-const foodGstDict = {
+const foodGstDict: GstDict = {
   Villa: (59 / 100) * (5 / 100),
   Cottage: (55 / 100) * (5 / 100),
   Dormitory: (67 / 100) * (5 / 100),
