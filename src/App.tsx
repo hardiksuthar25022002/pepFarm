@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import { Button } from "./components/ui/button";
 import html2canvas from "html2canvas";
@@ -10,6 +10,15 @@ import { Input } from "./components/ui/input";
 import { Dialog, DialogContent } from "./components/ui/dialog";
 import { Label } from "./components/ui/label";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Trash } from "lucide-react";
+
 function generateInvoiceNumber() {
   const prefix = "INV";
   const timestamp = Date.now();
@@ -18,14 +27,19 @@ function generateInvoiceNumber() {
   return invoiceNumber;
 }
 
+const today = new Date();
+const tomorrow = new Date();
+tomorrow.setDate(today.getDate() + 1);
+
+const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
 const formData = {
   name: "",
   address: "",
   invNumber: generateInvoiceNumber(),
   contact: "",
-  checkindate: "",
-  checkoutdate: "",
-  roomtype: "",
+  checkindate: formatDate(today),
+  checkoutdate: formatDate(tomorrow),
   roomRatePerNight: "0",
   numberOfNights: "0",
   accommodation: "0",
@@ -40,10 +54,68 @@ const formData = {
   packageRate: "0",
   advance: "0",
   due: "0",
+  foodType: "Veg",
+};
+
+const ROOMLIMIT = 3;
+const FOODLIMIT = 2;
+
+const accGstDict = {
+  Villa: (41 / 100) * (12 / 100),
+  Cottage: (45 / 100) * (12 / 100),
+  Dormitory: (33 / 100) * (12 / 100),
+};
+
+const foodGstDict = {
+  Villa: (59 / 100) * (5 / 100),
+  Cottage: (55 / 100) * (5 / 100),
+  Dormitory: (67 / 100) * (5 / 100),
 };
 
 const App = () => {
+  const defaultFoodType = {
+    type: "Veg",
+    noOfPersons: 0,
+    amount: 0,
+    accGst: 0,
+    foodGst: 0,
+    totalPackageCharges: 0,
+    roomRatePerNight: 0,
+  };
+  const defaultRoomType = {
+    type: "Villa",
+    food: [defaultFoodType],
+  };
+
   const [form, setForm] = useState(formData);
+  const [roomTypes, setRoomTypes] = useState([defaultRoomType]);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const dateDiff = moment(form?.checkoutdate).diff(form?.checkindate, "days");
+
+  useEffect(() => {
+    const cloneRoomType = [...roomTypes];
+    let cloneGrandTotal = 0;
+
+    cloneRoomType?.forEach((room) => {
+      room?.food?.forEach((food) => {
+        const amount = Math.round(
+          food?.noOfPersons * dateDiff * food?.roomRatePerNight
+        );
+        const accGst = Math.round(amount * accGstDict?.[room?.type]);
+        const foodGst = Math.round(amount * foodGstDict?.[room?.type]);
+        const totalPackageCharges = amount + accGst + foodGst;
+        food.amount = amount;
+        food.accGst = accGst;
+        food.foodGst = foodGst;
+
+        food.totalPackageCharges = totalPackageCharges;
+        cloneGrandTotal = cloneGrandTotal + totalPackageCharges;
+      });
+    });
+
+    setGrandTotal(cloneGrandTotal);
+  }, [roomTypes, dateDiff]);
+
   const divRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -169,174 +241,156 @@ const App = () => {
             <p className="text-center w-full font-bold text-xl">Stay Details</p>
           </div>
           <table className="w-full">
-            <tbody>
+            <tbody className="text-center">
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
+                <td className="border text-left  border-[#214132] px-10   pb-2">
                   Check-in Date:{" "}
                 </td>
-                <td className="border  border-[#214132]  px-4  pb-2">
+                <td
+                  colSpan={6}
+                  className="border text-center  border-[#214132]  px-4  pb-2"
+                >
                   {moment(form.checkindate).format("DD-MM-YYYY")}
                 </td>
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
+                <td className="border text-left  border-[#214132] px-10   pb-2">
                   Check-out Date:{" "}
                 </td>
-                <td className="border  border-[#214132]  px-4  pb-2">
+                <td
+                  colSpan={6}
+                  className="border text-center  border-[#214132]  px-4  pb-2"
+                >
                   {moment(form.checkoutdate).format("DD-MM-YYYY")}
                 </td>
               </tr>
               <tr>
-                <td className="border  border-[#214132]  px-10  pb-2">
+                <td className="border text-left  border-[#214132]  px-10  pb-2">
                   Room Type:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.roomtype}
-                </td>
+                {roomTypes?.map((room) => (
+                  <td
+                    colSpan={6 / roomTypes?.length}
+                    className="border text-center  border-[#214132] px-4   pb-2"
+                  >
+                    {room?.type}
+                  </td>
+                ))}
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
-                  Room Rate per Night:{" "}
+                <td className="border text-left  border-[#214132]  px-10  pb-2">
+                  Package Rate / Person / Night:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  Rs. {form.roomRatePerNight}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center text-[14px]  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.type}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  Number of Persons:{" "}
+                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.noOfPersons}
+                    </td>
+                  ))
+                )}
+              </tr>
+              <tr>
+                <td className="border text-left  border-[#214132] px-10   pb-2">
                   Number of Nights:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.numberOfNights}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map(() => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {dateDiff}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
-                  Package Rate:{" "}
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  Amount:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.packageRate}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-2 w-full">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="border bg-[#8f3b1f] text-[#c6b16e]  border-[#214132] p-2 uppercase">
-                  <p className="text-center w-full font-bold text-lg flex justify-center items-center h-full">
-                    Summary of Charges
-                  </p>
-                </th>
-                <th className="border bg-[#8f3b1f] text-[#c6b16e]  border-[#214132]  p-2 uppercase">
-                  <p className="text-center w-full font-bold text-lg flex justify-center items-center h-full">
-                    Amount (INR)
-                  </p>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
-                  Accommodation
-                </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.accommodation}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.amount}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132]  px-10  pb-2">
-                  Food & Beverage{" "}
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  GST 12% On Accomodation:{" "}
                 </td>
-                <td className="border  border-[#214132]  px-4  pb-2">
-                  {form.meals}
-                </td>
-              </tr>
-
-              <tr>
-                <td className="border  border-[#214132]  px-10  pb-2">
-                  Spa Services{" "}
-                </td>
-                <td className="border   border-[#214132] px-4  pb-2">
-                  {form.spaServices}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.accGst}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
-                  Activities{" "}
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  GST 5% on F&B:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.activities}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.foodGst}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132] px-10   pb-2">
-                  Games{" "}
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  Total Package Charges:{" "}
                 </td>
-                <td className="border  border-[#214132] px-4   pb-2">
-                  {form.games}
-                </td>
+                {roomTypes?.map((room) =>
+                  room?.food?.map((food) => (
+                    <td
+                      colSpan={2 / roomTypes?.[0]?.food?.length}
+                      className="border text-center  border-[#214132] px-4   pb-2"
+                    >
+                      {food?.totalPackageCharges}
+                    </td>
+                  ))
+                )}
               </tr>
               <tr>
-                <td className="border  border-[#214132]  px-10  pb-2">
-                  Transportation{" "}
+                <td className="border text-left  border-[#214132] px-10   pb-2">
+                  Grand Total:{" "}
                 </td>
-                <td className="border  border-[#214132]  px-4  pb-2">
-                  {form.transportation}
-                </td>
-              </tr>
-              <tr>
-                <td className="border  border-[#214132]  px-10  pb-2">
-                  Other Services{" "}
-                </td>
-                <td className="border  border-[#214132]  px-4  pb-2">
-                  {form.otherServices}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-2 w-full">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="border bg-[#8f3b1f] text-[#c6b16e]  uppercase border-[#214132]  p-2">
-                  <p className="text-center w-full font-bold text-lg">
-                    Tax Details
-                  </p>
-                </th>
-                <th className="border bg-[#8f3b1f] text-[#c6b16e]  uppercase  border-[#214132]  p-2">
-                  <p className="text-center w-full font-bold text-lg">
-                    Amount (INR)
-                  </p>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-[#214132] px-10   pb-2">
-                  CGST + SGST @ 12% on Accomodation
-                </td>
-                <td className="border border-[#214132] px-4  pb-2">
-                  {form?.cgst}
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-[#214132]  px-10  pb-2">
-                  CGST + SGST @ 5% on Food & Beverage
-                </td>
-                <td className="border border-[#214132] px-4  pb-2">
-                  {form?.sgst}
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-[#214132]  px-10  pb-2">
-                  Total Tax{" "}
-                </td>
-                <td className="border border-[#214132] px-4  pb-2">
-                  {parseInt(form?.cgst) + parseInt(form?.sgst)}
+                <td
+                  colSpan={6}
+                  className="border text-center  border-[#214132] px-4   pb-2"
+                >
+                  {grandTotal}
                 </td>
               </tr>
             </tbody>
@@ -350,7 +404,11 @@ const App = () => {
               <span className="font-bold">Rs. {form?.advance}</span>
             </div>
             <div>
-              Advance Due:<span className="font-bold"> Rs. {form?.due}</span>
+              Advance Due:
+              <span className="font-bold">
+                {" "}
+                Rs. {grandTotal - parseInt(form.advance)}
+              </span>
             </div>
           </div>
         </div>
@@ -402,9 +460,9 @@ const App = () => {
       </div>
 
       <Dialog open={open} onOpenChange={() => setOpen(false)}>
-        <DialogContent className="min-w-[800px]">
+        <DialogContent className="min-w-[1000px] overflow-y-scroll h-[90%]">
           <div className="p-10 gap-y-2 grid grid-cols-2 gap-x-2">
-            <div className="w-full">
+            <div>
               <Label>Name</Label>
               <Input
                 className="w-full"
@@ -431,7 +489,7 @@ const App = () => {
                 placeholder={`Enter Contact`}
               />
             </div>
-            <div className="grid grid-cols-2 gap-x-2">
+            <div className="grid grid-cols-2 gap-x-4">
               <div>
                 <Label>Check In Date</Label>
 
@@ -457,171 +515,170 @@ const App = () => {
                 />
               </div>
             </div>
+            {roomTypes?.map((room, index) => (
+              <div className="border p-4 col-span-2">
+                <div className="col-span-2 flex justify-between items-end w-full gap-x-4">
+                  <div className="w-full">
+                    <Label>Room Type</Label>
+
+                    <Select
+                      value={room?.type}
+                      onValueChange={(value) => {
+                        const cloneRoomType = [...roomTypes];
+                        cloneRoomType[index].type = value;
+                        setRoomTypes(cloneRoomType);
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select room type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Villa">Villa</SelectItem>
+                        <SelectItem value="Cottage">Cottage</SelectItem>
+                        <SelectItem value="Dormitory">Dormitory</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex justify-center items-center gap-x-2">
+                    {
+                      <Button
+                        className="gap-x-2"
+                        onClick={() => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType.push(defaultRoomType);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        disabled={
+                          !(
+                            index == roomTypes.length - 1 &&
+                            roomTypes.length !== ROOMLIMIT
+                          )
+                        }
+                      >
+                        <Plus size={18} /> Room
+                      </Button>
+                    }
+                    {
+                      <Button
+                        className="gap-x-2"
+                        disabled={index === 0}
+                        onClick={() => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType.splice(index, 1);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                      >
+                        <Trash size={18} /> Room
+                      </Button>
+                    }
+                  </div>
+                </div>
+                {room?.food?.map((food, foodIndex) => (
+                  <div className="col-span-2 flex justify-between items-end gap-x-4">
+                    <div className="w-[250px]">
+                      <Label>Food Type</Label>
+
+                      <Select
+                        onValueChange={(value) => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType[index].food[foodIndex].type = value;
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        value={food?.type}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select food type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Veg">Veg</SelectItem>
+                          <SelectItem value="Non Veg">Non Veg</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Room Rate / Night</Label>
+
+                      <Input
+                        value={food?.roomRatePerNight}
+                        onChange={(e) => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType[index].food[
+                            foodIndex
+                          ].roomRatePerNight = parseInt(e.target.value);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        placeholder={`Enter Room Rate per night`}
+                      />
+                    </div>
+                    <div>
+                      <Label>Number of Persons</Label>
+
+                      <Input
+                        value={food?.noOfPersons}
+                        onChange={(e) => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType[index].food[foodIndex].noOfPersons =
+                            parseInt(e.target.value);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        placeholder={`Enter No. of nights`}
+                      />
+                    </div>
+
+                    {
+                      <Button
+                        onClick={() => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType[index].food.push(defaultFoodType);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        disabled={
+                          !(
+                            foodIndex == roomTypes?.[index]?.food?.length - 1 &&
+                            roomTypes?.[index]?.food?.length !== FOODLIMIT
+                          )
+                        }
+                        className="gap-x-2"
+                      >
+                        <Plus size={18} />
+                        Food Type
+                      </Button>
+                    }
+                    {
+                      <Button
+                        onClick={() => {
+                          const cloneRoomType = [...roomTypes];
+                          cloneRoomType[index].food.splice(foodIndex, 1);
+                          setRoomTypes(cloneRoomType);
+                        }}
+                        disabled={foodIndex === 0}
+                        className="gap-x-2"
+                      >
+                        <Trash size={18} />
+                        Food Type
+                      </Button>
+                    }
+                  </div>
+                ))}
+              </div>
+            ))}
+
             <div>
-              <Label>Room Type</Label>
+              <Label>Advance</Label>
 
               <Input
-                value={form.roomtype}
-                onChange={(e) => setForm({ ...form, roomtype: e.target.value })}
-                placeholder={`Enter Room Type`}
+                value={form.advance}
+                onChange={(e) => setForm({ ...form, advance: e.target.value })}
+                placeholder={`Enter Advance`}
               />
             </div>
-            <div className="grid grid-cols-2 gap-x-2">
-              <div>
-                <Label>Room Rate Per Night</Label>
+            <div>
+              <Label>Due</Label>
 
-                <Input
-                  value={form.roomRatePerNight}
-                  onChange={(e) =>
-                    setForm({ ...form, roomRatePerNight: e.target.value })
-                  }
-                  placeholder={`Enter Room Rate per night`}
-                />
-              </div>
-              <div>
-                <Label>Number of Nights</Label>
-
-                <Input
-                  value={form.numberOfNights}
-                  onChange={(e) =>
-                    setForm({ ...form, numberOfNights: e.target.value })
-                  }
-                  placeholder={`Enter No. of nights`}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-2">
-              <div>
-                <Label>Package Rate</Label>
-
-                <Input
-                  value={form.packageRate}
-                  onChange={(e) =>
-                    setForm({ ...form, packageRate: e.target.value })
-                  }
-                  placeholder={`Enter package rate`}
-                />
-              </div>
-              <div>
-                <Label>Acommodation</Label>
-
-                <Input
-                  value={form.accommodation}
-                  onChange={(e) =>
-                    setForm({ ...form, accommodation: e.target.value })
-                  }
-                  placeholder={`Enter accommodation`}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
-              <div>
-                <Label>Meals</Label>
-
-                <Input
-                  value={form.meals}
-                  onChange={(e) => setForm({ ...form, meals: e.target.value })}
-                  placeholder={`Enter meals`}
-                />
-              </div>
-              <div>
-                <Label>Spa Services</Label>
-
-                <Input
-                  value={form.spaServices}
-                  onChange={(e) =>
-                    setForm({ ...form, spaServices: e.target.value })
-                  }
-                  placeholder={`Enter spa Services`}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
-              <div>
-                <Label>Activities</Label>
-
-                <Input
-                  value={form.activities}
-                  onChange={(e) =>
-                    setForm({ ...form, activities: e.target.value })
-                  }
-                  placeholder={`Enter activities`}
-                />
-              </div>
-              <div>
-                <Label>Games</Label>
-
-                <Input
-                  value={form.games}
-                  onChange={(e) => setForm({ ...form, games: e.target.value })}
-                  placeholder={`Enter games`}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-2">
-              <div>
-                <Label>Transportation</Label>
-
-                <Input
-                  value={form.transportation}
-                  onChange={(e) =>
-                    setForm({ ...form, transportation: e.target.value })
-                  }
-                  placeholder={`Enter transportation`}
-                />
-              </div>
-              <div>
-                <Label>Other Services</Label>
-
-                <Input
-                  value={form.otherServices}
-                  onChange={(e) =>
-                    setForm({ ...form, otherServices: e.target.value })
-                  }
-                  placeholder={`Enter otherServices`}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-x-2 col-span-2">
-              <div>
-                <Label>CGST</Label>
-
-                <Input
-                  value={form.cgst}
-                  onChange={(e) => setForm({ ...form, cgst: e.target.value })}
-                  placeholder={`Enter CGST`}
-                />
-              </div>
-              <div>
-                <Label>SGST</Label>
-
-                <Input
-                  value={form.sgst}
-                  onChange={(e) => setForm({ ...form, sgst: e.target.value })}
-                  placeholder={`Enter SGST`}
-                />
-              </div>
-              <div>
-                <Label>Advance</Label>
-
-                <Input
-                  value={form.advance}
-                  onChange={(e) =>
-                    setForm({ ...form, advance: e.target.value })
-                  }
-                  placeholder={`Enter Advance`}
-                />
-              </div>
-              <div>
-                <Label>Due</Label>
-
-                <Input
-                  value={form.due}
-                  onChange={(e) => setForm({ ...form, due: e.target.value })}
-                  placeholder={`Enter Due Amount`}
-                />
-              </div>
+              <Input
+                value={grandTotal - parseInt(form.advance)}
+                placeholder={`Enter Due Amount`}
+              />
             </div>
 
             <Button
