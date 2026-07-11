@@ -34,6 +34,7 @@ tomorrow.setDate(today.getDate() + 1);
 const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
 const formData = {
+  billDate: formatDate(today),
   name: "",
   address: "",
   invNumber: generateInvoiceNumber(),
@@ -199,7 +200,7 @@ const App = () => {
             <p className="font-bold">
               Date:{" "}
               <span className="font-normal">
-                {moment().format("DD-MM-YYYY")}
+                {moment(form.billDate).format("DD-MM-YYYY")}
               </span>
             </p>
           </div>
@@ -505,16 +506,31 @@ const App = () => {
                 placeholder={`Enter Address`}
               />
             </div>
-            <div>
-              <Label>Contact</Label>
 
-              <Input
-                value={form.contact}
-                onChange={(e) => setForm({ ...form, contact: e.target.value })}
-                placeholder={`Enter Contact`}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-x-4">
+            <div className="grid grid-cols-4 col-span-2 gap-x-4">
+              <div>
+                <Label>Contact</Label>
+
+                <Input
+                  value={form.contact}
+                  onChange={(e) =>
+                    setForm({ ...form, contact: e.target.value })
+                  }
+                  placeholder={`Enter Contact`}
+                />
+              </div>
+              <div>
+                <Label>Bill Date</Label>
+
+                <Input
+                  type="date"
+                  value={form.billDate}
+                  onChange={(e) =>
+                    setForm({ ...form, billDate: e.target.value })
+                  }
+                  placeholder={`Enter Bill Date`}
+                />
+              </div>
               <div>
                 <Label>Check In Date</Label>
 
