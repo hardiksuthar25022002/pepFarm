@@ -69,16 +69,16 @@ interface GstDict {
 }
 
 const accGstDict: GstDict = {
-  Villa: (41 / 100) * (12 / 100),
-  Cottage: (45 / 100) * (12 / 100),
-  Dormitory: (33 / 100) * (12 / 100),
+  Villa: 5 / 100,
+  Cottage: 5 / 100,
+  Dormitory: 5 / 100,
 };
 
-const foodGstDict: GstDict = {
-  Villa: (59 / 100) * (5 / 100),
-  Cottage: (55 / 100) * (5 / 100),
-  Dormitory: (67 / 100) * (5 / 100),
-};
+// const foodGstDict: GstDict = {
+//   Villa: (59 / 100) * (5 / 100),
+//   Cottage: (55 / 100) * (5 / 100),
+//   Dormitory: (67 / 100) * (5 / 100),
+// };
 
 const App = () => {
   const defaultFoodType = {
@@ -86,7 +86,7 @@ const App = () => {
     noOfPersons: 0,
     amount: 0,
     accGst: 0,
-    foodGst: 0,
+    // foodGst: 0,
     totalPackageCharges: 0,
     roomRatePerNight: 0,
   };
@@ -107,14 +107,14 @@ const App = () => {
     cloneRoomType?.forEach((room) => {
       room?.food?.forEach((food) => {
         const amount = Math.round(
-          food?.noOfPersons * dateDiff * food?.roomRatePerNight
+          food?.noOfPersons * dateDiff * food?.roomRatePerNight,
         );
         const accGst = Math.round(amount * accGstDict?.[room?.type]);
-        const foodGst = Math.round(amount * foodGstDict?.[room?.type]);
-        const totalPackageCharges = amount + accGst + foodGst;
+        // const foodGst = Math.round(amount * foodGstDict?.[room?.type]);
+        const totalPackageCharges = amount + accGst;
         food.amount = amount;
         food.accGst = accGst;
-        food.foodGst = foodGst;
+        // food.foodGst = foodGst;
 
         food.totalPackageCharges = totalPackageCharges;
         cloneGrandTotal = cloneGrandTotal + totalPackageCharges;
@@ -155,7 +155,7 @@ const App = () => {
         imgX,
         imgY,
         imgWidth * ratio,
-        imgHeight * ratio
+        imgHeight * ratio,
       );
 
       pdf.save(form?.name);
@@ -301,7 +301,7 @@ const App = () => {
                     >
                       {food?.type}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
@@ -314,7 +314,7 @@ const App = () => {
                     >
                       {food?.roomRatePerNight}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
@@ -329,7 +329,7 @@ const App = () => {
                     >
                       {food?.noOfPersons}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
@@ -344,7 +344,7 @@ const App = () => {
                     >
                       {dateDiff}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
@@ -359,12 +359,12 @@ const App = () => {
                     >
                       {food?.amount}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
                 <td className="border text-left  border-[#214132] px-10   pb-2">
-                  GST 12% On Accomodation:{" "}
+                  GST 5%:{" "}
                 </td>
                 {roomTypes?.map((room) =>
                   room?.food?.map((food) => (
@@ -374,12 +374,12 @@ const App = () => {
                     >
                       {food?.accGst}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
-              <tr>
+              {/* <tr>
                 <td className="border text-left  border-[#214132] px-10   pb-2">
-                  GST 5% on F&B:{" "}
+                  GST 5% 
                 </td>
                 {roomTypes?.map((room) =>
                   room?.food?.map((food) => (
@@ -391,7 +391,7 @@ const App = () => {
                     </td>
                   ))
                 )}
-              </tr>
+              </tr> */}
               <tr>
                 <td className="border text-left  border-[#214132] px-10   pb-2">
                   Total Package Charges:{" "}
@@ -404,7 +404,7 @@ const App = () => {
                     >
                       {food?.totalPackageCharges}
                     </td>
-                  ))
+                  )),
                 )}
               </tr>
               <tr>
