@@ -20,13 +20,8 @@ import {
 import { Plus, Trash } from "lucide-react";
 
 function generateInvoiceNumber() {
-  const prefix = "INV";
-  const timestamp = Date.now();
-  const uniquePart = (timestamp % 1000).toString().padStart(6, "0"); // Get the last 3 digits of the timestamp
-  const invoiceNumber = `${prefix}${uniquePart}`;
-  return invoiceNumber;
+  return `INV-${moment().format("YYMMDD")}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
-
 const today = new Date();
 const tomorrow = new Date();
 tomorrow.setDate(today.getDate() + 1);
@@ -488,6 +483,27 @@ const App = () => {
       <Dialog open={open} onOpenChange={() => setOpen(false)}>
         <DialogContent className="min-w-[1000px] overflow-y-scroll h-[90%]">
           <div className="p-10 gap-y-2 grid grid-cols-2 gap-x-2">
+            <div className="col-span-2">
+              <Label>Invoice Number</Label>
+              <div className="flex gap-x-2">
+                <Input
+                  value={form.invNumber}
+                  onChange={(e) =>
+                    setForm({ ...form, invNumber: e.target.value })
+                  }
+                  placeholder="Enter Invoice Number"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    setForm({ ...form, invNumber: generateInvoiceNumber() })
+                  }
+                >
+                  Regenerate
+                </Button>
+              </div>
+            </div>
             <div>
               <Label>Name</Label>
               <Input
